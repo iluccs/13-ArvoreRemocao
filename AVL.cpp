@@ -1,4 +1,5 @@
-﻿#include <iostream>
+#include <iostream>
+#include <cstdlib> // Para system()
 using namespace std;
 
 /* -----------------------------------------------------------
@@ -12,7 +13,7 @@ struct NO {
 };
 
 /* Raiz da árvore */
-NO* raiz = NULL;
+NO* raiz = nullptr;
 
 /* ----------------- Protótipos ----------------------------- */
 // Interface principal
@@ -54,7 +55,7 @@ void menu() {
         cout << "1 - Inicializar Arvore\n";
         cout << "2 - Exibir quantidade de elementos\n";
         cout << "3 - Inserir elemento\n";
-		cout << "4 - Remover elemento\n";
+        cout << "4 - Remover elemento\n";
         cout << "5 - Exibir arvore\n";
         cout << "6 - Buscar elemento\n";
         cout << "7 - Sair\n\n";
@@ -62,33 +63,33 @@ void menu() {
         cin >> op;
 
         switch (op) {
-                   case 1:
-                       inicializar();
-                       break;
-                   case 2:
-                       exibirQuantidade();
-                       break;
-                   case 3:
-                       inserir();
-                       break;
-				   case 4:
-                       remover();
-					   break;
-                   case 5:
-                       exibir();
-                       break;
-                   case 6:
-                       buscar();
-                       break;
-               }
+        case 1:
+            inicializar();
+            break;
+        case 2:
+            exibirQuantidade();
+            break;
+        case 3:
+            inserir();
+            break;
+        case 4:
+            remover();
+            break;
+        case 5:
+            exibir();
+            break;
+        case 6:
+            buscar();
+            break;
+        }
 
-		cout << endl; 
+        cout << endl;
         if (op != 7) system("pause"); // Aguarda tecla (Windows)
     }
 }
 
 void inicializar() {
-    raiz = NULL;
+    raiz = nullptr;
     cout << "Arvore inicializada!\n";
 }
 
@@ -112,7 +113,7 @@ void exibirQuantidade() {
 }
 
 void exibir() {
-    if (raiz == NULL) {
+    if (raiz == nullptr) {
         cout << "Arvore vazia!\n";
         return;
     }
@@ -129,93 +130,61 @@ void buscar() {
 
 // ---------- Criação e inserção ----------
 NO* criaNO(int valor) {
-    NO* novo = (NO*)malloc(sizeof(NO));
-    if (novo == NULL) return NULL;      // Falha de alocação
+    NO* novo = new NO; // Usando new em vez de malloc
+    if (novo == nullptr) return nullptr; // Falha de alocação
 
     novo->valor = valor;
-    novo->esq = NULL;
-    novo->dir = NULL;
+    novo->esq = nullptr;
+    novo->dir = nullptr;
     novo->altura = 0;
     return novo;
 }
 
 int alturaNo(NO* no) {
-    if (no == NULL) return -1;
+    if (no == nullptr) return -1;
     return no->altura;
 }
 
 int maior(int a, int b) {
-    if (a > b) return a;
-    return b;
+    return (a > b) ? a : b;
 }
 
 int fatorBalanceamento(NO* no) {
-    if (no == NULL) return 0;
+    if (no == nullptr) return 0;
     return alturaNo(no->esq) - alturaNo(no->dir);
 }
 
-NO* girarDireita(NO* y) {  
-   /* Rotação simples à direita  
-             y                x  
-            / \              / \  
-           x   T3   =>      T1  y  
-          / \                  / \  
-        T1  T2               T2  T3  
-   */  
-
-   // Passo 1: Armazene o filho esquerdo de 'y' em uma variável temporária 'x'.  
-   // Passo 2: Transfira a subárvore direita de 'x' para a subárvore esquerda de 'y'.  
-   // Passo 3: Atualize 'x' para ser o novo nó raiz da subárvore.  
-   // Passo 4: Recalcule as alturas dos nós afetados.  
-   // Passo 5: Retorne o novo nó raiz ('x').  
-
-    NO* x = y->esq;  
-    NO* T2 = x->dir; 
+NO* girarDireita(NO* y) {
+    NO* x = y->esq;
+    NO* T2 = x->dir;
 
     // Realiza a rotação  
-    x->dir = y;  
-    y->esq = T2;  
+    x->dir = y;
+    y->esq = T2;
 
     // Atualiza as alturas  
-    y->altura = maior(alturaNo(y->esq), alturaNo(y->dir)) + 1;  
-    x->altura = maior(alturaNo(x->esq), alturaNo(x->dir)) + 1;  
+    y->altura = maior(alturaNo(y->esq), alturaNo(y->dir)) + 1;
+    x->altura = maior(alturaNo(x->esq), alturaNo(x->dir)) + 1;
 
-	// Retorna o novo nó raiz
-	return x;
+    return x;
+}
 
+NO* girarEsquerda(NO* x) {
+    NO* y = x->dir;
+    NO* T2 = y->esq;
 
-}  
-
-NO* girarEsquerda(NO* x) 
-{  
-   /* Rotação simples à esquerda  
-           x                    y  
-          / \                  / \  
-         T1  y      =>        x  T3  
-            / \              / \  
-           T2 T3            T1 T2  
-   */  
-
-    NO* y = x->dir;      // Passo 1: filho direito de x
-    NO* T2 = y->esq;     // Subárvore esquerda de y
-
-    // Passo 2: Transfere T2 para a direita de x
     x->dir = T2;
-
-    // Passo 3: y vira nova raiz da subárvore
     y->esq = x;
 
-    // Passo 4: Atualiza alturas
     x->altura = maior(alturaNo(x->esq), alturaNo(x->dir)) + 1;
     y->altura = maior(alturaNo(y->esq), alturaNo(y->dir)) + 1;
 
-    // Passo 5: Retorna nova raiz
     return y;
 }
 
 // Função auxiliar para balancear um nó AVL
 NO* balancearNo(NO* no) {
-    if (no == NULL) return no;
+    if (no == nullptr) return no;
     int fb = fatorBalanceamento(no);
     // Caso Esquerda-Esquerda
     if (fb > 1 && fatorBalanceamento(no->esq) >= 0)
@@ -237,8 +206,7 @@ NO* balancearNo(NO* no) {
 }
 
 NO* insereArvore(NO* no, int valor) {
-    /* Inserção binária normal ----------------------------- */
-    if (no == NULL) {
+    if (no == nullptr) {
         return criaNO(valor);
     }
     if (valor < no->valor) {
@@ -248,17 +216,14 @@ NO* insereArvore(NO* no, int valor) {
         no->dir = insereArvore(no->dir, valor);
     }
     else {
-        /* Valor já existe – não insere duplicado */
-        return no;
+        return no; // Valor já existe – não insere duplicado
     }
-    /* Atualiza altura do nó */
     no->altura = maior(alturaNo(no->esq), alturaNo(no->dir)) + 1;
-    /* Balanceamento AVL usando função auxiliar */
     return balancearNo(no);
 }
 
 NO* removerArvore(NO* no, int valor) {
-    if (no == NULL) {
+    if (no == nullptr) {
         cout << "Elemento NAO encontrado.\n";
         return no;
     }
@@ -269,43 +234,50 @@ NO* removerArvore(NO* no, int valor) {
         no->dir = removerArvore(no->dir, valor);
     }
     else {
-                
         // Caso 1: Nó sem filhos
-        // Se o nó não possui filhos (esquerda e direita são NULL), basta removê-lo e retornar NULL para o pai.
-
+        if (no->esq == nullptr && no->dir == nullptr) {
+            delete no;
+            return nullptr;
+        }
         // Caso 2: Nó com apenas um filho
-        // Se o nó possui apenas um filho (esquerda ou direita), retorna o ponteiro para esse filho, liberando o nó atual.
-
+        else if (no->esq == nullptr) {
+            NO* temp = no->dir;
+            delete no;
+            return temp;
+        }
+        else if (no->dir == nullptr) {
+            NO* temp = no->esq;
+            delete no;
+            return temp;
+        }
         // Caso 3: Nó com dois filhos
-        // Se o nó possui dois filhos, encontra o sucessor (menor valor da subárvore direita),
-        // copia o valor do sucessor para o nó atual e remove recursivamente o sucessor.
+        else {
+            NO* temp = no->dir;
+            while (temp->esq != nullptr) {
+                temp = temp->esq;
+            }
+            no->valor = temp->valor;
+            no->dir = removerArvore(no->dir, temp->valor);
+        }
     }
-    // Atualiza altura e balanceia
     no->altura = maior(alturaNo(no->esq), alturaNo(no->dir)) + 1;
     return balancearNo(no);
 }
 
 // ---------- Utilidades ----------
 int elementosArvore(NO* no) {
-    if (no == NULL) return 0;
+    if (no == nullptr) return 0;
     return 1 + elementosArvore(no->esq) + elementosArvore(no->dir);
 }
 
 void exibirElementosArvore(NO* no, int espaco, bool direita) {
-    /* Impressão recursiva “deitada”:
-       └── valor
-          ├── ...
-          └── ...
-    */
-    if (no == NULL) return;
+    if (no == nullptr) return;
 
     const int DIST = 6; // deslocamento entre níveis
     espaco += DIST;
 
-    // Exibe primeiro a subárvore direita (fica “em cima” no console)
     exibirElementosArvore(no->dir, espaco, true);
 
-    // Impressão do nó atual
     cout << endl;
     for (int i = DIST; i < espaco; i++) cout << " ";
 
@@ -316,12 +288,11 @@ void exibirElementosArvore(NO* no, int espaco, bool direita) {
 
     cout << no->valor << endl;
 
-    // Exibe subárvore esquerda
     exibirElementosArvore(no->esq, espaco, false);
 }
 
 void buscarElementoArvore(NO* no, int valor) {
-    if (no == NULL) {
+    if (no == nullptr) {
         cout << "Elemento NAO encontrado.\n";
         return;
     }
